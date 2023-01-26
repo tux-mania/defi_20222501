@@ -33,39 +33,44 @@ class Menu:
         return choices_dict
 
 
-main_menu = Menu(name="Menu Principal", choices=content_type_list)
-movies_menu = Menu(name="Films", choices=movies_type_list, parent=main_menu)
-tvshows_menu = Menu(name="Séries", choices=tvshows_type_list, parent=main_menu)
+main_menu = Menu(name="Main Menu", choices=content_type_list)
+movies_menu = Menu(name="Movies", choices=movies_type_list, parent=main_menu)
+tvshows_menu = Menu(name="TvShows", choices=tvshows_type_list, parent=main_menu)
+for movie_type in movies_type_list:
+    globals()[movie_type.lower()] = Menu(name=movie_type, choices=[f'movies_{movie_type}_list'])
+for tvshow_type in tvshows_type_list:
+    globals()[tvshow_type.lower()] = Menu(name=tvshow_type, choices=[f'tvshows_{tvshow_type}_list'])
 
 
 def display_menu(item: object):
-    print(f"{'#'*10} {item.name} {'#'*10}")
-    for key, value in item.menu.items():
-        print(f'{key}: {value}')
-
-    if item.parent:
-        print('R: Retour au menu précédent')
-    print('Q: Quitter')
-
-    user_choice = input('\nEntrez votre choix svp: ')
+    user_choice = ''
     available_options = [str(index) for index in range(1, len(item.menu) + 1)] + ['q']
     if item.parent:
         available_options.append('r')
 
-    if user_choice not in available_options:
-        print('Veuillez entrer une valeur valide svp!\n')
-        display_menu(item=item)
-    elif user_choice.lower() == 'r':
+    while user_choice not in available_options:
+        print(f"{'#'*10} {item.name} {'#'*10}")
+        for key, value in item.menu.items():
+            print(f'{key}: {value}')
+
+        if item.parent:
+            print('B: Back to the previous menu')
+        print('Q: Quit')
+
+        user_choice = input('\nEntrez votre choix svp: ')
+
+    if user_choice.lower() == 'r':
         display_menu(item.parent)
     elif user_choice.lower() == 'q':
         sys.exit(1)
-    elif item.name == "main_menu" and user_choice == "1":
-        print("toto")
+    elif item.name == "Main Menu" and user_choice == "1":
         display_menu(movies_menu)
-    elif item.name == "main_menu" and user_choice == "2":
+    elif item.name == "Main Menu" and user_choice == "2":
         display_menu(tvshows_menu)
+    else:
+        print(f'{item.name.split("_")[0].lower()}_{item.menu[int(user_choice)].lower()}_list')
+        display_menu(f'{item.name.split("_")[0].lower()}_{item.menu[int(user_choice)].lower()}_list')
 
 
 if __name__ == "__main__":
     display_menu(main_menu)
-    # display_menu(movies_menu)
